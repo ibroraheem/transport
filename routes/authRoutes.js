@@ -1,8 +1,8 @@
 const express = require('express')
 const router = express.Router()
-const User = require('../controllers/userController')
+const {login, register} = require('../controllers/userController')
 
-router.post('/register', User.register)
-router.post('/login', User.login)
+router.post('/register', register)
+router.post('/login', login)
 
 module.exports= router
