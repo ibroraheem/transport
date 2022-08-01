@@ -13,7 +13,7 @@ connectDB()
 app.get('/', (req, res) => {
     res.status(StatusCode.OK).send('Hello World')
 })
-app.use('/', require('./routes/bookingRoutes'))
+app.use('/', require('./routes/ticketRoutes'))
 app.use("/admin", require('./routes/authRoutes'))
 
 

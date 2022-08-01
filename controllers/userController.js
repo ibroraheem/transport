@@ -1,62 +1,66 @@
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
-const StatusCode = require('http-status-codes')
 require('dotenv').config()
 
 const register = async (req, res) => {
-    const { name, email, password } = req.body
+    const {name, email, password} = req.body
+    hashedPassword = await bcrypt.hash(password, 10)
+    const user = new User({
+        name,
+        email,
+        password: hashedPassword
+    })
     try {
-        const user = await User.findOne({ email })
-        if (user) {
-            return res.status(StatusCode.BAD_REQUEST).json({ message: "Email already Exists" })
-        }
-        const hashedPassword = await bcrypt.hash(password, 10)
-        const newUser = new User({
-            name,
-            email,
-            password: hashedPassword
+        const newUser = await user.save()
+        res.status(201).json({
+            message: 'User created successfully',
+            user: newUser
         })
-        await newUser.save()
-        res.status(StatusCode.CREATED).json({ message: "User created successfully" })
-    } catch (error) {
-        console.log(error)
-        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
-            message: "Error Creating user"
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
         })
     }
-
 }
 
-const login = (req, res) => {
-    const { email, password } = req.body
-    User.findOne({ email }, (err, user) => {
-        if (err) {
-            res.status(StatusCode.BAD_REQUEST).send(err)
-        }
-        else if (!user) {
-            res.status(StatusCode.NOT_FOUND).send('User not found')
-        }
-        else {
-            bcrypt.compare(password, user.password, (err, isMatch) => {
-                if (err) {
-                    res.status(StatusCode.BAD_REQUEST).send(err)
-                }
-                else if (!isMatch) {
-                    res.status(StatusCode.UNAUTHORIZED).send('Incorrect password')
-                }
-                else {
-                    const payload = {
-                        id: user._id,
-                        name: user.name,
-                        email: user.email
-                    }
-                    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' })
-                    res.status(StatusCode.OK).send({ token })
-                }
+const login = async (req, res) => {
+    const {email, password} = req.body
+    try {
+        const user = await User.findOne({email})
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
             })
         }
-    })
+        const isMatch = await bcrypt.compare(password, user.password)
+        if (!isMatch) {
+            return res.status(400).json({
+                message: 'Invalid credentials'
+            })
+        }
+        const payload = {
+            user: {
+                id: user._id
+            }
+        }
+        jwt.sign(payload, process.env.JWT_SECRET, {
+            expiresIn: '1h'
+        }, (err, token) => {
+            if (err) {
+                throw err
+            }
+            res.status(200).json({
+                token,
+                expiresIn: 3600
+            })
+        }
+        )
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        })
+    }
 }
 
 module.exports = { register, login }

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const TransportSchema = new mongoose.Schema({
+const TicketSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -14,10 +14,6 @@ const TransportSchema = new mongoose.Schema({
         required: true
     },
     address: {
-        type: String,
-        required: true
-    },
-    occupation: {
         type: String,
         required: true
     },
@@ -61,8 +57,15 @@ const TransportSchema = new mongoose.Schema({
     next_of_kin_relationship: {
         type: String,
         required: true
+    },
+    date: {
+        type: Date
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 })
 
-const Transport = new mongoose.model('Transport', TransportSchema)
-module.exports= Transport
+const Ticket = new mongoose.model('Ticket', TicketSchema)
+module.exports= Ticket
