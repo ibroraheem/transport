@@ -4,14 +4,18 @@ const bcrypt = require('bcryptjs')
 require('dotenv').config()
 
 const register = async (req, res) => {
-    const {name, email, password} = req.body
+    const { name, email, password } = req.body
     hashedPassword = await bcrypt.hash(password, 10)
+    const isFirstAccount = (await User.countDocuments()) === 0
+    const role = isFirstAccount ? 'admin' : 'user'
     const user = new User({
         name,
         email,
+        role,
         password: hashedPassword
     })
     try {
+
         const newUser = await user.save()
         res.status(201).json({
             message: 'User created successfully',
@@ -33,9 +37,9 @@ const register = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    const {email, password} = req.body
+    const { email, password } = req.body
     try {
-        const user = await User.findOne({email})
+        const user = await User.findOne({ email })
         if (!user) {
             return res.status(404).json({
                 message: 'User not found'
