@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
     res.status(StatusCode.OK).send('Hello World')
 })
 app.use('/', require('./routes/ticketRoutes'))
-app.use("/admin", require('./routes/authRoutes'))
+app.use("/", require('./routes/authRoutes'))
 
 
 const PORT = process.env.PORT

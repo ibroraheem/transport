@@ -36,6 +36,7 @@ const TicketSchema = new mongoose.Schema({
     }, 
     time: {
         type: String,
+        enum: ['morning', 'afternoon'],
         required: true
     },
     next_of_kin_name:{
@@ -57,13 +58,6 @@ const TicketSchema = new mongoose.Schema({
     next_of_kin_relationship: {
         type: String,
         required: true
-    },
-    date: {
-        type: Date
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
     }
 })
 

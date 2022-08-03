@@ -15,13 +15,21 @@ const register = async (req, res) => {
         const newUser = await user.save()
         res.status(201).json({
             message: 'User created successfully',
-            user: newUser
+            user: newUser.name
         })
     } catch (err) {
         res.status(500).json({
             message: err.message
         })
     }
+    const payload = {
+        user: {
+            id: user._id,
+        }
+    }
+    jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '1h'
+    })
 }
 
 const login = async (req, res) => {
@@ -41,7 +49,7 @@ const login = async (req, res) => {
         }
         const payload = {
             user: {
-                id: user._id
+                id: user._id,
             }
         }
         jwt.sign(payload, process.env.JWT_SECRET, {
@@ -51,8 +59,7 @@ const login = async (req, res) => {
                 throw err
             }
             res.status(200).json({
-                token,
-                expiresIn: 3600
+                token
             })
         }
         )
