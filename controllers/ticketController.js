@@ -47,10 +47,10 @@ const createTicket = async (req, res) => {
                         })
 
                     }
-                    // res.status(200).json({
-                    //     message: "Ticket created successfully",
-                    //     url: url
-                    // })
+                    res.status(200).json({
+                        message: "Ticket created successfully",
+                        url: url
+                    })
                 }
             )
         })
